@@ -10,5 +10,5 @@ const setup = () => {
 test("Component renders without error", () => {
   const wrapper = setup()
   const component = findByTestAttr(wrapper, "component-currencies")
-  expect(component.length).toBe(1)
+  expect(component.length).toBeTruthy()
 })
