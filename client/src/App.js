@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"
-import { AddPanelProvider } from "./contexts/addPanelContext"
+import addPanelContext from "./contexts/addPanelContext"
 import Chart from "./components/chart/Chart"
 import Currencies from "./components/currencies/Currencies"
 import AddPanel from "./components/addPanel/AddPanel"
@@ -50,9 +50,9 @@ function App() {
       <Grid container spacing={2}>
         <Chart />
         <Currencies />
-        <AddPanelProvider>
+        <addPanelContext.AddPanelProvider>
           <AddPanel />
-        </AddPanelProvider>
+        </addPanelContext.AddPanelProvider>
       </Grid>
       <div>
         {data

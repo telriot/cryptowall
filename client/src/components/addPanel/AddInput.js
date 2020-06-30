@@ -3,15 +3,14 @@ import { Autocomplete } from "@material-ui/lab"
 import { CircularProgress, TextField } from "@material-ui/core"
 import axios from "axios"
 import useDebounce from "../../hooks/useDebounce"
-import {
-  useAddPanelState,
-  useAddPanelDispatch,
-} from "../../contexts/addPanelContext"
+import addPanelContext from "../../contexts/addPanelContext"
 const AUTOCOMPLETE_URL = "api/coins/autocomplete/"
 
 function AddInput() {
-  const { options, loading, input } = useAddPanelState()
-  const dispatch = useAddPanelDispatch()
+  const { options, loading, input, selection } = React.useContext(
+    addPanelContext.AddPanelStateContext
+  )
+  const dispatch = React.useContext(addPanelContext.AddPanelDispatchContext)
   const inputField = React.useRef()
   const [open, setOpen] = useState(false)
   const debouncedInput = useDebounce(input, 300)
@@ -45,7 +44,8 @@ function AddInput() {
 
   useEffect(() => {
     if (!open) {
-      dispatch({ type: "RESET_STATE" })
+      dispatch({ type: "SET_OPTIONS", options: [] })
+      dispatch({ type: "SET_INPUT", input: "" })
     }
   }, [open])
 
@@ -55,13 +55,13 @@ function AddInput() {
       input: e.target.value,
     })
   }
-  const handleAutocompleteChange = (e) => {
-    e.persist()
+  const handleAutocompleteChange = (e, value) => {
     dispatch({
-      type: "SET_INPUT",
-      input: e.target.textContent,
+      type: "SET_SELECTION",
+      selection: value,
     })
   }
+
   return (
     <Autocomplete
       id="asynchronous-demo"
@@ -73,9 +73,14 @@ function AddInput() {
       onClose={() => {
         setOpen(false)
       }}
+      value={selection}
+      data-testid="autocomplete"
+      //disablePortal={true}
+
+      //ListboxProps={{ "data-testid": "list-box" }}
       getOptionSelected={(option, value) => option.name === value.name}
       getOptionLabel={(option) => option.name}
-      onChange={handleAutocompleteChange}
+      onChange={(e, value) => handleAutocompleteChange(e, value)}
       options={options}
       loading={loading}
       renderInput={(params) => (
@@ -84,9 +89,9 @@ function AddInput() {
           {...params}
           label="Coin Name"
           variant="outlined"
+          onChange={handleChange}
+          value={input}
           InputProps={{
-            onChange: handleChange,
-            value: input,
             ...params.InputProps,
             endAdornment: (
               <React.Fragment>

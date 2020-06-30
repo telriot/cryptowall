@@ -3,6 +3,7 @@ import { TYPES } from "./types"
 
 const initialState = {
   input: "",
+  selection: undefined,
   loading: false,
   options: [],
 }
@@ -19,6 +20,11 @@ const AddPanelProvider = ({ children }) => {
         return {
           ...state,
           input: action.input,
+        }
+      case TYPES.SET_SELECTION:
+        return {
+          ...state,
+          selection: action.selection,
         }
       case TYPES.SET_LOADING:
         return {
@@ -64,4 +70,10 @@ function useAddPanelDispatch() {
   return context
 }
 
-export { AddPanelProvider, useAddPanelState, useAddPanelDispatch }
+export default {
+  AddPanelStateContext,
+  AddPanelDispatchContext,
+  AddPanelProvider,
+  useAddPanelState,
+  useAddPanelDispatch,
+}
