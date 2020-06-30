@@ -15,7 +15,8 @@ const io = socketIo(server)
 exports.io = io
 const wsActions = require("./websocket/index")
 const debug = require("debug")("portfolio-app:server")
-
+//const CoinInfos = require("./models/CoinInfo")
+const data = require("./assets/coinList.json")
 //Connect to the DB
 mongoose.connect(
   process.env.MONGO_URI || `mongodb://localhost:27017/portfolio-app`,
@@ -31,9 +32,14 @@ db.once("open", function () {
 })
 mongoose.set("useFindAndModify", false)
 mongoose.set("useCreateIndex", true)
-//Refresh DB on start
+//Refresh Active Coin DB on start
 helpers.getAllPrices()
 helpers.getAllHistoricalData(91)
+
+//Refresh coin name database
+//CoinInfos.collection.insertMany(data, function(err,r) {
+// db.close();
+// })
 
 // Setup public assets directory
 app.use(logger("dev"))

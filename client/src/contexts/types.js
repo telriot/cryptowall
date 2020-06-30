@@ -1,1 +1,6 @@
-export const TYPES = {}
+export const TYPES = {
+  RESET_STATE: "RESET_STATE",
+  SET_INPUT: "SET_INPUT",
+  SET_OPTIONS: "SET_OPTIONS",
+  SET_LOADING: "SET_LOADING",
+}

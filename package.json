@@ -20,11 +20,13 @@
     "http-errors": "~1.6.3",
     "mongoose": "^5.9.16",
     "morgan": "~1.9.1",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.3.0",
+    "uninstall": "0.0.0"
   },
   "main": "app.js",
   "devDependencies": {
     "concurrently": "^5.1.0",
+    "enzyme-to-json": "^3.5.0",
     "nodemon": "^2.0.2"
   },
   "author": "",
