@@ -3,14 +3,17 @@ import { Autocomplete } from "@material-ui/lab"
 import { CircularProgress, TextField } from "@material-ui/core"
 import axios from "axios"
 import useDebounce from "../../hooks/useDebounce"
-import addPanelContext from "../../contexts/addPanelContext"
+import {
+  AddPanelStateContext,
+  AddPanelDispatchContext,
+} from "../../contexts/addPanelContext"
 const AUTOCOMPLETE_URL = "api/coins/autocomplete/"
 
 function AddInput() {
   const { options, loading, input, selection } = React.useContext(
-    addPanelContext.AddPanelStateContext
+    AddPanelStateContext
   )
-  const dispatch = React.useContext(addPanelContext.AddPanelDispatchContext)
+  const dispatch = React.useContext(AddPanelDispatchContext)
   const inputField = React.useRef()
   const [open, setOpen] = useState(false)
   const debouncedInput = useDebounce(input, 300)
@@ -75,9 +78,6 @@ function AddInput() {
       }}
       value={selection}
       data-testid="autocomplete"
-      //disablePortal={true}
-
-      //ListboxProps={{ "data-testid": "list-box" }}
       getOptionSelected={(option, value) => option.name === value.name}
       getOptionLabel={(option) => option.name}
       onChange={(e, value) => handleAutocompleteChange(e, value)}

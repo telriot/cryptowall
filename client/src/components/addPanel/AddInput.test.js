@@ -2,74 +2,95 @@ import React from "react"
 import { render, screen, fireEvent, cleanup } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import AddInput from "./AddInput"
-import addPanelContext from "../../contexts/addPanelContext"
+import {
+  AddPanelProvider,
+  AddPanelDispatchContext,
+  AddPanelStateContext,
+} from "../../contexts/addPanelContext"
 import axios from "axios"
-import { Autocomplete } from "@material-ui/lab"
 
 afterEach(cleanup)
-jest.mock("axios")
 
-describe("Add Input", () => {
-  let getByText, getByRole, getByTestId
-  beforeEach(
-    () =>
-      ({ getByText, getByRole, getByTestId } = render(
-        <addPanelContext.AddPanelProvider>
-          <AddInput />
-        </addPanelContext.AddPanelProvider>
-      ))
+test("renders Add Input component", () => {
+  render(
+    <AddPanelProvider>
+      <AddInput />
+    </AddPanelProvider>
   )
-  test("renders Add Input component", () => {
-    render(
-      <addPanelContext.AddPanelProvider>
-        <AddInput />
-      </addPanelContext.AddPanelProvider>
-    )
-  })
-  test("Context input value is updated by input field", () => {
-    const input = getByRole("textbox")
-    expect(input.value).toBe("")
-    fireEvent.change(input, { target: { value: "bitcoin" } })
-    expect(input.value).toBe("bitcoin")
-  })
 })
+
 describe("Autocomplete", () => {
   let getByText, getByRole, getByTestId
+  const options = [
+    { code: "btc", id: "bitcoin", name: "Bitcoin" },
+    { code: "eth", id: "ethereum", name: "Ethereum" },
+  ]
+
   let state = {
     input: "",
-    options: [
-      { code: "btc", id: "bitcoin", name: "Bitcoin" },
-      { code: "eth", id: "ethereum", name: "Ethereum" },
-    ],
+    options,
     selection: undefined,
     loading: false,
   }
-  let dispatch = jest.fn((payload) => {
-    console.log("dispatch", payload)
-  })
-  const mockHandleChange = jest.fn((payload) =>
-    console.log("handlechange", payload)
-  )
+  let dispatch = jest.fn()
+
   beforeEach(() => {
     return ({ getByText, getByRole, getByTestId } = render(
-      <addPanelContext.AddPanelStateContext.Provider value={state}>
-        <addPanelContext.AddPanelDispatchContext.Provider value={dispatch}>
+      <AddPanelStateContext.Provider value={state}>
+        <AddPanelDispatchContext.Provider value={dispatch}>
           <AddInput />
-        </addPanelContext.AddPanelDispatchContext.Provider>
-      </addPanelContext.AddPanelStateContext.Provider>
+        </AddPanelDispatchContext.Provider>
+      </AddPanelStateContext.Provider>
     ))
   })
+  describe("Input on change", () => {
+    let input
+    beforeEach(() => {
+      input = getByRole("textbox")
+      expect(input.value).toBe("")
+      fireEvent.change(input, { target: { value: "bit" } })
+    })
+    test("Controlled input changes on input", () => {
+      expect(input.value).toBe("bit")
+    })
+    test("Dispatch fires correctly on change", () => {
+      expect(dispatch).toHaveBeenCalledWith({ type: "SET_INPUT", input: "bit" })
+    })
+  })
 
-  test("Context selection is updated by autocomplete selection", () => {
-    const input = getByRole("textbox")
-    const autocomplete = getByTestId("autocomplete")
-    input.focus()
-    fireEvent.change(document.activeElement, { target: { value: "b" } })
-    fireEvent.keyDown(document.activeElement, { key: "ArrowDown" })
-    fireEvent.keyDown(document.activeElement, { key: "Enter" })
-    expect(dispatch).toHaveBeenCalledWith({
-      type: "SET_SELECTION",
-      selection: { code: "btc", id: "bitcoin", name: "Bitcoin" },
+  describe("Input on blur", () => {
+    let input
+    beforeEach(() => {
+      input = getByRole("textbox")
+      input.focus()
+      fireEvent.change(document.activeElement, { target: { value: "bit" } })
+      fireEvent.blur(document.activeElement)
+    })
+    test("Input resets on blur", () => {
+      expect(input.value).toBe("")
+    })
+    test("Dispatch fires correctly on blur", () => {
+      expect(dispatch).toHaveBeenCalledWith({ type: "SET_INPUT", input: "" })
+    })
+  })
+
+  describe("Autocomplete on selection", () => {
+    let input
+    beforeEach(() => {
+      input = getByRole("textbox")
+      input.focus()
+      fireEvent.change(document.activeElement, { target: { value: "b" } })
+      fireEvent.keyDown(document.activeElement, { key: "ArrowDown" })
+      fireEvent.keyDown(document.activeElement, { key: "Enter" })
+    })
+    test("Autocomplete value changes on selection", () => {
+      expect(input.value).toBe("Bitcoin")
+    })
+    test("Dispatch fires correctly on selection", () => {
+      expect(dispatch).toHaveBeenCalledWith({
+        type: "SET_SELECTION",
+        selection: options[0],
+      })
     })
   })
 })

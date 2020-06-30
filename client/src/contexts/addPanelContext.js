@@ -70,7 +70,7 @@ function useAddPanelDispatch() {
   return context
 }
 
-export default {
+export {
   AddPanelStateContext,
   AddPanelDispatchContext,
   AddPanelProvider,
