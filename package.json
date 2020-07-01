@@ -27,7 +27,8 @@
   "devDependencies": {
     "concurrently": "^5.1.0",
     "enzyme-to-json": "^3.5.0",
-    "nodemon": "^2.0.2"
+    "nodemon": "^2.0.2",
+    "resize-observer-polyfill": "^1.5.1"
   },
   "author": "",
   "license": "ISC",

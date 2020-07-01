@@ -20,7 +20,6 @@ function AddPanel() {
         elevation={2}
         data-test="component-add-panel"
       >
-        Add Panel
         <AddInput />
         <AddButton />
       </Paper>
