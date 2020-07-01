@@ -1,17 +1,17 @@
 import React from "react"
-import { render, fireEvent, cleanup } from "@testing-library/react"
 import AddInput from "./AddInput"
 import {
   AddPanelDispatchContext,
   AddPanelStateContext,
 } from "../../contexts/addPanelContext"
+import { render, fireEvent, cleanup } from "@testing-library/react"
 import axios from "axios"
 import useDebounce from "../../hooks/useDebounce"
 
+afterEach(cleanup)
+
 jest.mock("axios")
 jest.mock("../../hooks/useDebounce")
-
-afterEach(cleanup)
 
 let state = {
   input: "",
