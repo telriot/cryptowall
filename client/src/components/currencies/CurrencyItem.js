@@ -14,7 +14,7 @@ function CurrencyItem({ coin }) {
 
   return (
     <Chip
-      label={`${coin.name}: ${coin.usd}`}
+      label={`${coin.name}: ${coin.usd}$`}
       onClick={handleClick}
       onDelete={handleDelete(coin.id)}
     />
