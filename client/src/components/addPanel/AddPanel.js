@@ -2,6 +2,7 @@ import React from "react"
 import { Paper, Grid } from "@material-ui/core"
 import { makeStyles } from "@material-ui/core/styles"
 import AddInput from "./AddInput"
+import AddButton from "./AddButton"
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -20,8 +21,9 @@ function AddPanel() {
         data-test="component-add-panel"
       >
         Add Panel
+        <AddInput />
+        <AddButton />
       </Paper>
-      <AddInput />
     </Grid>
   )
 }
