@@ -7,9 +7,9 @@ import {
   AddPanelStateContext,
   AddPanelDispatchContext,
 } from "../../contexts/addPanelContext"
-const AUTOCOMPLETE_URL = "api/coins/autocomplete/"
 
 function AddInput() {
+  const AUTOCOMPLETE_URL = "api/coins/autocomplete/"
   const { options, loading, input, selection } = React.useContext(
     AddPanelStateContext
   )
@@ -23,7 +23,7 @@ function AddInput() {
     try {
       const response = await axios.get(AUTOCOMPLETE_URL, { params: { input } })
       const coins = response.data
-
+      console.log(coins)
       dispatch({
         type: "SET_OPTIONS",
         options: coins.map((coin) => ({
