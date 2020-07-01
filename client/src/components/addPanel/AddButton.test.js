@@ -7,12 +7,9 @@ import {
 } from "../../contexts/addPanelContext"
 import { SocketStateContext } from "../../contexts/socketContext"
 
-import axios from "axios"
-
 afterEach(cleanup)
 
 jest.mock("axios")
-let socketState = { data: [] }
 
 let dispatch = jest.fn()
 let socket = { current: { emit: jest.fn() } }
