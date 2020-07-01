@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useEffect } from "react"
 import { Autocomplete } from "@material-ui/lab"
 import { CircularProgress, TextField } from "@material-ui/core"
 import axios from "axios"
@@ -15,7 +15,7 @@ function AddInput() {
   )
   const dispatch = React.useContext(AddPanelDispatchContext)
   const inputField = React.useRef()
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = React.useState(false)
   const debouncedInput = useDebounce(input, 300)
 
   const getCoinNames = async (input) => {
@@ -70,6 +70,7 @@ function AddInput() {
       id="asynchronous-demo"
       style={{ width: 300 }}
       open={open}
+      disablePortal={true}
       onOpen={() => {
         setOpen(true)
       }}
