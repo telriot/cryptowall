@@ -1,12 +1,15 @@
 import React from "react"
 import { Button } from "@material-ui/core"
-import { AddPanelStateContext } from "../../contexts/addPanelContext"
+import {
+  AddPanelStateContext,
+  AddPanelDispatchContext,
+} from "../../contexts/addPanelContext"
 import { SocketStateContext } from "../../contexts/socketContext"
 
 function AddButton() {
   const { selection } = React.useContext(AddPanelStateContext)
+  const dispatch = React.useContext(AddPanelDispatchContext)
   const { socket } = React.useContext(SocketStateContext)
-
   const handleAdd = (selection) => {
     if (!selection) return
 
@@ -15,6 +18,11 @@ function AddButton() {
       symbol: selection.code,
       name: selection.name,
     })
+    dispatch({
+      type: "SET_SELECTION",
+      selection: undefined,
+    })
+    dispatch({ type: "SET_INPUT", input: "" })
   }
 
   return (

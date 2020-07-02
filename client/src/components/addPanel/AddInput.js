@@ -17,13 +17,18 @@ function AddInput() {
   const inputField = React.useRef()
   const [open, setOpen] = React.useState(false)
   const debouncedInput = useDebounce(input, 300)
+  //This is to fix the issues MUI Autocomplete has with async option lists
+  const [selectionPlaceholder, setSelectionPlaceholder] = React.useState({
+    code: "test",
+    id: "test",
+    name: "test",
+  })
 
   const getCoinNames = async (input) => {
     dispatch({ type: "SET_LOADING", loading: true })
     try {
       const response = await axios.get(AUTOCOMPLETE_URL, { params: { input } })
       const coins = response.data
-      console.log(coins)
       dispatch({
         type: "SET_OPTIONS",
         options: coins.map((coin) => ({
@@ -46,16 +51,16 @@ function AddInput() {
   }, [debouncedInput])
 
   useEffect(() => {
-    if (!open) {
+    if (!open && !selection) {
       dispatch({ type: "SET_OPTIONS", options: [] })
       dispatch({ type: "SET_INPUT", input: "" })
     }
   }, [open])
 
-  const handleChange = (e) => {
+  const handleChange = (e, input) => {
     dispatch({
       type: "SET_INPUT",
-      input: e.target.value,
+      input,
     })
   }
   const handleAutocompleteChange = (e, value) => {
@@ -63,7 +68,22 @@ function AddInput() {
       type: "SET_SELECTION",
       selection: value,
     })
+    if (!selection)
+      dispatch({
+        type: "SET_INPUT",
+        input: "",
+      })
+    if (value) {
+      setSelectionPlaceholder(value)
+    }
   }
+
+  const placeholderFilter = (options) =>
+    options.filter((option) => {
+      return selectionPlaceholder.name === selection && selection.name
+        ? true
+        : option.name !== selectionPlaceholder.name
+    })
 
   return (
     <Autocomplete
@@ -78,11 +98,13 @@ function AddInput() {
         setOpen(false)
       }}
       value={selection}
-      data-testid="autocomplete"
+      filterOptions={(options) => placeholderFilter(options)}
       getOptionSelected={(option, value) => option.name === value.name}
       getOptionLabel={(option) => option.name}
       onChange={(e, value) => handleAutocompleteChange(e, value)}
-      options={options}
+      inputValue={input}
+      onInputChange={(e, input) => handleChange(e, input)}
+      options={[...options, selectionPlaceholder]}
       loading={loading}
       renderInput={(params) => (
         <TextField
@@ -90,10 +112,9 @@ function AddInput() {
           {...params}
           label="Coin Name"
           variant="outlined"
-          onChange={handleChange}
-          value={input}
           InputProps={{
             ...params.InputProps,
+
             endAdornment: (
               <React.Fragment>
                 {loading ? (

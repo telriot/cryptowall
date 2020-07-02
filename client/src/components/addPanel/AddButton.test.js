@@ -79,5 +79,13 @@ describe("AddButton tests", () => {
         name: state.selection.name,
       })
     })
+    test("Clear selection dispatch is fired on click", () => {
+      const button = getByRole("button")
+      fireEvent.click(button)
+      expect(dispatch).toHaveBeenCalledWith({
+        type: "SET_SELECTION",
+        selection: undefined,
+      })
+    })
   })
 })

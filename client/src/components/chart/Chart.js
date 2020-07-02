@@ -17,7 +17,7 @@ import {
   mouse,
 } from "d3"
 import { red } from "@material-ui/core/colors"
-
+const DATE_INTERVAL = 90
 const useStyles = makeStyles((theme) => ({
   paper: {
     height: 500,
@@ -33,6 +33,9 @@ const useStyles = makeStyles((theme) => ({
     whiteSpace: "nowrap",
   },
 }))
+const day = new Date()
+const startingDay = day.setDate(day.getDate() - DATE_INTERVAL)
+const today = new Date()
 
 function Chart() {
   const { socketState } = React.useContext(SocketStateContext)
@@ -80,13 +83,13 @@ function Chart() {
     const margin = { top: 10, right: 30, bottom: 30, left: 60 }
     const tooltipScale = scaleLinear()
       .domain([0, width - margin.left - margin.right])
-      .range(extent(domainData, (d) => d.x))
+      .range([startingDay, Date.parse(today)])
     const tooltipScaleToIndex = scaleLinear()
-      .domain(extent(domainData, (d) => d.x))
+      .domain([startingDay, Date.parse(today)])
       .range([0, formattedData[0].length])
 
     const scaleX = scaleTime()
-      .domain(extent(domainData, (d) => d.x))
+      .domain([startingDay, Date.parse(today)])
       .range([margin.left, width - margin.right])
     svg
       .select(".x-axis")
@@ -107,12 +110,13 @@ function Chart() {
       .attr("class", "path")
       .attr("fill", "none")
       .attr("stroke", (d, index) => palette[index])
-      .attr("stroke-width", 4)
+      .attr("stroke-width", 1.5)
       .attr(
         "d",
         line()
           .x((d) => {
-            return scaleX(d.x)
+            if (scaleX(d.x) > margin.left) return scaleX(d.x)
+            return margin.left
           })
           .y((d) => {
             return scaleY(d.y)
