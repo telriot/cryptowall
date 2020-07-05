@@ -2,20 +2,26 @@ import React from "react"
 import CurrencyItem from "./CurrencyItem"
 import { SocketStateContext } from "../../contexts/socketContext"
 import { render, fireEvent, cleanup } from "@testing-library/react"
+import { AppStateContext } from "../../contexts/appContext"
+
 import axios from "axios"
 
 afterEach(cleanup)
 
 let socket = { current: { emit: jest.fn() } }
 let coin = { _id: "1234556776", code: "btc", id: "bitcoin", name: "Bitcoin" }
+let appState = { hiddenCoins: new Set() }
+
 describe("CurrencyItem tests", () => {
   let getByText, getByRole, getByTestId, getAllByRole
 
   beforeEach(() => {
     return ({ getByText, getByRole, getByTestId, getAllByRole } = render(
-      <SocketStateContext.Provider value={{ socket }}>
-        <CurrencyItem coin={coin} />
-      </SocketStateContext.Provider>
+      <AppStateContext.Provider value={appState}>
+        <SocketStateContext.Provider value={{ socket }}>
+          <CurrencyItem coin={coin} />
+        </SocketStateContext.Provider>
+      </AppStateContext.Provider>
     ))
   })
 

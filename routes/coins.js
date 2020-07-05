@@ -7,19 +7,17 @@ const CoinInfos = require("../models/CoinInfo")
 router.get("/", async (req, res, next) => {
   try {
     const coins = await Coins.find()
-    res.send(coins)
+    res.send({ coins })
   } catch (error) {
     console.log(error)
   }
 })
 router.get("/autocomplete", async (req, res, next) => {
   const { input } = req.query
-  console.log(req.query)
   try {
     const coins = await CoinInfos.find({
       name: { $regex: input, $options: "i" },
     })
-    console.log("coins", coins)
     res.send(coins)
   } catch (error) {
     console.log(error)

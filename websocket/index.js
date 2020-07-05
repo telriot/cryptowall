@@ -5,28 +5,36 @@ const Coins = require("../models/Coin")
 module.exports = {
   emit: async () => {
     const coins = await Coins.find()
-    socketIo.io.emit("FromAPI", coins)
+    socketIo.io.emit("FromAPI", { coins })
   },
 
-  getPricesAndEmit: async () => {
+  getPricesAndEmit: async (base) => {
     try {
-      await helpers.getAllPrices()
+      await helpers.getAllPrices(base)
       module.exports.emit()
     } catch (error) {
       console.log(error)
     }
   },
-  getHistoricalDataAndEmit: async (interval) => {
+  getHistoricalDataAndEmit: async (interval, base = "usd") => {
     try {
-      await helpers.getAllHistoricalData(interval)
+      await helpers.getAllHistoricalData(interval, base)
       module.exports.emit()
     } catch (error) {
       console.log(error)
     }
   },
-  addCoinAndEmit: async (id, symbol, name) => {
+  refreshAllDataAndEmit: async (base = "usd") => {
     try {
-      await helpers.addCoin(id, symbol, name)
+      await helpers.refreshAllData(base)
+      module.exports.emit()
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  addCoinAndEmit: async (id, symbol, name, base) => {
+    try {
+      await helpers.addCoin(id, symbol, name, base)
       module.exports.emit()
     } catch (error) {
       console.log(error)

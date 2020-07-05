@@ -33,9 +33,7 @@ db.once("open", function () {
 mongoose.set("useFindAndModify", false)
 mongoose.set("useCreateIndex", true)
 //Refresh Active Coin DB on start
-helpers.getAllPrices()
-helpers.getAllHistoricalData(91)
-
+helpers.refreshAllData()
 //Refresh coin name database
 //CoinInfos.collection.insertMany(data, function(err,r) {
 // db.close();
@@ -49,26 +47,33 @@ app.use(cookieParser())
 app.use(express.static(path.join(__dirname, "public")))
 
 // Web Socket
+
+let base = "usd"
+helpers.refreshAllData()
 io.on("connection", (socket) => {
   console.log("New client connected")
-  socket.on("add coin", ({ id, symbol, name }) =>
-    wsActions.addCoinAndEmit(id, symbol, name)
+  socket.on("add coin", ({ id, symbol, name, base }) =>
+    wsActions.addCoinAndEmit(id, symbol, name, base)
   )
+  socket.on("change base", (newBase) => {
+    wsActions.refreshAllDataAndEmit(newBase)
+    base = newBase
+  })
+
   socket.on("delete coin", (id) => wsActions.deleteCoinAndEmit(id))
   socket.on("disconnect", () => {
     console.log("user disconnected")
   })
 })
 // Start Web Socket Intervals
-let priceInterval
-if (!priceInterval)
-  priceInterval = setInterval(() => wsActions.getPricesAndEmit(), 30000)
-let yearlyDataInterval
-if (!yearlyDataInterval)
-  yearlyDataInterval = setInterval(
-    () => wsActions.getHistoricalDataAndEmit(91),
-    600000
+
+let refreshInterval
+if (!refreshInterval)
+  refreshInterval = setInterval(
+    () => wsActions.refreshAllDataAndEmit(base),
+    60000
   )
+
 // Mount Routes
 app.use("/", indexRouter)
 app.use("/api/coins", coinsRouter)

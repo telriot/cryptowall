@@ -32,7 +32,10 @@ const SocketProvider = ({ children }) => {
   const getInitialData = async () => {
     try {
       const results = await axios.get(ACTIVE_COINS_API)
-      socketDispatch({ type: TYPES.SET_ACTIVE_COINS_DATA, data: results.data })
+      socketDispatch({
+        type: TYPES.SET_ACTIVE_COINS_DATA,
+        data: results.data.coins,
+      })
     } catch (error) {
       console.log(error)
     }
@@ -42,7 +45,7 @@ const SocketProvider = ({ children }) => {
     getInitialData()
     socket.current = socketIOClient("/")
     socket.current.on("FromAPI", (data) => {
-      socketDispatch({ type: TYPES.SET_ACTIVE_COINS_DATA, data })
+      socketDispatch({ type: TYPES.SET_ACTIVE_COINS_DATA, data: data.coins })
     })
     return () => socket.current.disconnect()
   }, [])

@@ -9,20 +9,19 @@ const useStyles = makeStyles((theme) => ({
     height: 150,
     width: "100%",
   },
+  panelDiv: {
+    width: "100%",
+  },
 }))
 function AddPanel() {
   const classes = useStyles()
 
   return (
     <Grid item xs={5}>
-      <Paper
-        className={classes.paper}
-        elevation={2}
-        data-test="component-add-panel"
-      >
+      <div className={classes.panelDiv}>
         <AddInput />
         <AddButton />
-      </Paper>
+      </div>
     </Grid>
   )
 }

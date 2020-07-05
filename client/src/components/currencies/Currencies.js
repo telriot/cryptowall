@@ -15,16 +15,11 @@ function Currencies() {
   const { data } = socketState
   const classes = useStyles()
   return (
-    <Grid item xs={7}>
-      <Paper
-        className={classes.paper}
-        elevation={2}
-        data-testid="component-currencies"
-      >
-        {data.map((coin) => (
-          <CurrencyItem key={coin._id} coin={coin} />
+    <Grid data-testid="component-currencies" item xs={7}>
+      {data &&
+        data.map((coin, index) => (
+          <CurrencyItem key={coin._id} coin={coin} index={index} />
         ))}
-      </Paper>
     </Grid>
   )
 }

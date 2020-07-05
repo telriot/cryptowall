@@ -88,7 +88,6 @@ function AddInput() {
   return (
     <Autocomplete
       id="asynchronous-demo"
-      style={{ width: 300 }}
       open={open}
       disablePortal={true}
       onOpen={() => {

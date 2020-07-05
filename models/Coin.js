@@ -5,8 +5,15 @@ const CoinSchema = new Schema({
   id: String,
   symbol: String,
   name: String,
-  usd: Number,
   yearlyData: Array,
+  monthlyData: Array,
+  weeklyData: Array,
+  dailyData: Array,
+  value: Number,
+  dailyUpdated: Date,
+  weeklyUpdated: Date,
+  monthlyUpdated: Date,
+  yearlyUpdated: Date,
 })
 
 const Coin = mongoose.model("Coin", CoinSchema)

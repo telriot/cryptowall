@@ -2,6 +2,7 @@ import React from "react"
 import Currencies from "./Currencies"
 import { SocketStateContext } from "../../contexts/socketContext"
 import { render, screen, cleanup } from "@testing-library/react"
+import { AppStateContext } from "../../contexts/appContext"
 
 afterEach(cleanup)
 
@@ -12,13 +13,16 @@ let socketState = {
     { _id: "44444556776", code: "eth", id: "ethereum", name: "Ethereum" },
   ],
 }
+let appState = { hiddenCoins: new Set() }
 describe("Currencies tests", () => {
   let getByText, getByRole, getByTestId, getAllByRole
   beforeEach(() => {
     return ({ getByText, getByRole, getByTestId, getAllByRole } = render(
-      <SocketStateContext.Provider value={{ socket, socketState }}>
-        <Currencies />
-      </SocketStateContext.Provider>
+      <AppStateContext.Provider value={appState}>
+        <SocketStateContext.Provider value={{ socket, socketState }}>
+          <Currencies />
+        </SocketStateContext.Provider>
+      </AppStateContext.Provider>
     ))
   })
   test("Currencies render successfully", () => {

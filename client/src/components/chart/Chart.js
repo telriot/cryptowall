@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from "react"
 import { Paper, Grid } from "@material-ui/core"
 import { makeStyles } from "@material-ui/core/styles"
+import { AppStateContext } from "../../contexts/appContext"
 import useResizeObserver from "../../hooks/useResizeObserver"
 import { SocketStateContext } from "../../contexts/socketContext"
 import {
@@ -10,14 +11,23 @@ import {
   event,
   axisBottom,
   axisLeft,
-  min,
-  max,
   scaleLinear,
   line,
   mouse,
 } from "d3"
-import { red } from "@material-ui/core/colors"
-const DATE_INTERVAL = 90
+export const palette = [
+  "#8338ecff",
+  "#3a86ffff",
+  "#ffbe0bff",
+  "#fb5607ff",
+  "#ff006eff",
+  "#7fb800",
+  "#011627",
+  "#0ead69",
+  "#706677",
+  "#f2b5d4",
+]
+
 const useStyles = makeStyles((theme) => ({
   paper: {
     height: 500,
@@ -33,23 +43,42 @@ const useStyles = makeStyles((theme) => ({
     whiteSpace: "nowrap",
   },
 }))
-const day = new Date()
-const startingDay = day.setDate(day.getDate() - DATE_INTERVAL)
-const today = new Date()
 
 function Chart() {
   const { socketState } = React.useContext(SocketStateContext)
-  const data = socketState.data.length ? socketState.data : []
+  const state = React.useContext(AppStateContext)
+
+  const filterSocketData = (data) => {
+    return data.filter((el) => {
+      return !state.hiddenCoins.has(el.id)
+    })
+  }
+
+  const data = socketState.data.length ? filterSocketData(socketState.data) : []
   const classes = useStyles()
   const svgRef = useRef()
   const wrapperRef = useRef()
-
   const dimensions = useResizeObserver(wrapperRef)
-
+  const day = new Date()
+  const startingDay = day.setDate(day.getDate() - state.range)
+  const today = new Date()
+  const getDataRange = (timeframe) => {
+    switch (timeframe) {
+      case 1:
+        return "dailyData"
+      case 7:
+        return "weeklyData"
+      case 30:
+        return "monthlyData"
+      case 365:
+        return "yearlyData"
+    }
+  }
   const formatData = (data) => {
+    let dataRange = getDataRange(state.range)
     let items = []
     for (let item of data) {
-      items.push(item.yearlyData.map((el) => ({ x: el[0], y: el[1] })))
+      items.push(item[dataRange].map((el) => ({ x: el[0], y: el[1] })))
     }
     return items
   }
@@ -60,6 +89,7 @@ function Chart() {
     }
     return concatItem
   }
+
   useEffect(() => {
     const svg = select(svgRef.current)
     svg.selectAll(".path").remove()
@@ -68,17 +98,7 @@ function Chart() {
     if (!data.length) return
     const formattedData = formatData(data)
     const domainData = domainConcat(formattedData)
-    const palette = [
-      "#8338ecff",
-      "#3a86ffff",
-      "#ffbe0bff",
-      "#fb5607ff",
-      "#ff006eff",
-      "#7fb800",
-      "#011627",
-      "#0ead69",
-      "#706677",
-    ]
+
     const { height, width } = dimensions
     const margin = { top: 10, right: 30, bottom: 30, left: 60 }
     const tooltipScale = scaleLinear()
@@ -109,7 +129,11 @@ function Chart() {
       .join("path")
       .attr("class", "path")
       .attr("fill", "none")
-      .attr("stroke", (d, index) => palette[index])
+      .attr("stroke", (d, index) => {
+        const coinId = data[index]["id"]
+        const dataIndex = socketState.data.findIndex((el) => el.id === coinId)
+        return palette[dataIndex]
+      })
       .attr("stroke-width", 1.5)
       .attr(
         "d",
@@ -147,11 +171,12 @@ function Chart() {
             return `<h4>${date.toDateString().slice(4, 11)}</h4>`.concat(
               data
                 .map((coin) => {
-                  if (!coin.yearlyData[xIndex]) return "<div/>"
+                  let dataRange = getDataRange(state.range)
+                  if (!coin[dataRange][xIndex]) return "<div/>"
                   return `<div>
-                  <p>${coin.symbol.toUpperCase()}: ${coin.yearlyData[
+                  <p>${coin.symbol.toUpperCase()}: ${coin[dataRange][
                     xIndex
-                  ][1].toFixed(3)}</p> 
+                  ][1].toFixed(4)}</p> 
                 </div>`
                 })
                 .join(" ")
@@ -162,7 +187,7 @@ function Chart() {
           .style("left", `${event.clientX + 20}px`)
       })
       .on("mouseleave", () => wrapper.selectAll(".tooltip").remove())
-  }, [data, dimensions])
+  }, [data, dimensions, state.range])
   return (
     <Grid item xs={12}>
       <Paper
