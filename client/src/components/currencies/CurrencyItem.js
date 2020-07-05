@@ -25,6 +25,7 @@ function CurrencyItem({ coin, index }) {
     },
     deleteIconColorPrimary: {
       color: palette[index],
+      "&:hover": { color: "#888888" },
     },
   })
   const classes = useStyles()

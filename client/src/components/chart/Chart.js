@@ -152,13 +152,12 @@ function Chart() {
       .attr("height", height - margin.top - margin.bottom)
       .attr("transform", `translate(${margin.left},${margin.top})`)
       .attr("opacity", 0)
-
+    let verticalLine
     rect
       .on("mousemove", function (value, index) {
         const [x] = mouse(this)
         wrapper.select(".tooltip").remove()
         wrapper
-
           .selectAll(".tooltip")
           .data(formattedData)
           .join("div")
@@ -168,7 +167,18 @@ function Chart() {
             const time = tooltipScale(x)
             const xIndex = parseInt(tooltipScaleToIndex(time))
             const date = new Date(time)
-            return `<h4>${date.toDateString().slice(4, 11)}</h4>`.concat(
+            const weekday = new Intl.DateTimeFormat("en-US", {
+              weekday: "short",
+            }).format(date)
+
+            const range = getDataRange(state.range)
+            const dateString =
+              range === "yearlyData" || range === "monthlyData"
+                ? `<h4>${date.toDateString().slice(4, 11)}</h4>`
+                : range === "weeklyData" || range === "dailyData"
+                ? `<h4>${weekday}, ${date.toTimeString().slice(0, 5)}</h4>`
+                : null
+            return dateString.concat(
               data
                 .map((coin) => {
                   let dataRange = getDataRange(state.range)
@@ -183,11 +193,37 @@ function Chart() {
             )
           })
           .style("position", "absolute")
-          .style("top", `${event.clientY}px`)
+          .style("top", `${event.clientY - 30}px`)
           .style("left", `${event.clientX + 20}px`)
+
+        svg.selectAll(".vertical").remove()
+        svg
+          .append("line")
+          .attr("class", "vertical")
+          .attr("x1", event.offsetX)
+          .attr("y1", 0 + margin.top)
+          .attr("x2", event.offsetX)
+          .attr("y2", event.offsetY - 4)
+          .style("stroke-width", 0.25)
+          .style("stroke", "#616161")
+          .style("fill", "none")
+        svg
+          .append("line")
+          .attr("class", "vertical")
+          .attr("x1", event.offsetX)
+          .attr("y1", event.offsetY + 4)
+          .attr("x2", event.offsetX)
+          .attr("y2", height - margin.bottom)
+          .style("stroke-width", 0.25)
+          .style("stroke", "#616161")
+          .style("fill", "none")
       })
-      .on("mouseleave", () => wrapper.selectAll(".tooltip").remove())
+      .on("mouseleave", function () {
+        wrapper.selectAll(".tooltip").remove()
+        svg.selectAll(".vertical").remove()
+      })
   }, [data, dimensions, state.range])
+
   return (
     <Grid item xs={12}>
       <Paper
