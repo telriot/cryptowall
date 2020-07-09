@@ -195,7 +195,6 @@ module.exports = {
 
         const now = new Date()
         const nowToMs = now.getTime()
-        console.log(coin.dailyUpdated.getTime() < nowToMs)
         if (coin.dailyUpdated.getTime() + 55000 < nowToMs) {
           requestsArray.push(getDaily)
           requestsOrder.push("daily")
@@ -208,7 +207,7 @@ module.exports = {
           requestsArray.push(getMonthly)
           requestsOrder.push("monthly")
         }
-        if (coin.yearlyUpdated.getTime() + 43000000 < nowToMs) {
+        if (coin.yearlyUpdated.getTime() + 9500000 < nowToMs) {
           requestsArray.push(getYearly)
           requestsOrder.push("yearly")
         }
@@ -219,7 +218,6 @@ module.exports = {
         weeklyResponse = allResponses[requestsOrder.indexOf("weekly")]
         monthlyResponse = allResponses[requestsOrder.indexOf("monthly")]
         yearlyResponse = allResponses[requestsOrder.indexOf("yearly")]
-        console.log(requestsOrder)
         const buildUpdateObj = () => {
           let obj = { value: priceResponse.data[coin.id][base] }
           if (dailyResponse) {
@@ -236,7 +234,7 @@ module.exports = {
           }
           if (yearlyResponse) {
             obj.yearlyData = yearlyResponse.data.prices
-            obj.yearlyUpdatedO = Date.now()
+            obj.yearlyUpdated = Date.now()
           }
           return obj
         }

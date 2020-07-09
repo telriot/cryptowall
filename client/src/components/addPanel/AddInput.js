@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
 import { Autocomplete } from "@material-ui/lab"
-import { CircularProgress, TextField } from "@material-ui/core"
+import { CircularProgress, TextField, Popper } from "@material-ui/core"
 import axios from "axios"
 import useDebounce from "../../hooks/useDebounce"
 import {
@@ -89,7 +89,7 @@ function AddInput() {
     <Autocomplete
       id="asynchronous-demo"
       open={open}
-      disablePortal={true}
+      //disablePortal={true}
       onOpen={() => {
         setOpen(true)
       }}

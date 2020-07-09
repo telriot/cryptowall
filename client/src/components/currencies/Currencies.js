@@ -4,9 +4,8 @@ import { makeStyles } from "@material-ui/core/styles"
 import CurrencyItem from "./CurrencyItem"
 import { SocketStateContext } from "../../contexts/socketContext"
 const useStyles = makeStyles((theme) => ({
-  paper: {
-    height: 150,
-    width: "100%",
+  grid: {
+    marginBottom: "40px",
   },
 }))
 
@@ -15,7 +14,7 @@ function Currencies() {
   const { data } = socketState
   const classes = useStyles()
   return (
-    <Grid data-testid="component-currencies" item xs={7}>
+    <Grid data-testid="component-currencies" item xs={12} md={7}>
       {data &&
         data.map((coin, index) => (
           <CurrencyItem key={coin._id} coin={coin} index={index} />

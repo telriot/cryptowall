@@ -49,7 +49,6 @@ app.use(express.static(path.join(__dirname, "public")))
 // Web Socket
 
 let base = "usd"
-helpers.refreshAllData()
 io.on("connection", (socket) => {
   console.log("New client connected")
   socket.on("add coin", ({ id, symbol, name, base }) =>

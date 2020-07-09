@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react"
-import { Paper, Grid } from "@material-ui/core"
+import { Paper, Grid, useMediaQuery } from "@material-ui/core"
 import { makeStyles } from "@material-ui/core/styles"
 import { AppStateContext } from "../../contexts/appContext"
 import useResizeObserver from "../../hooks/useResizeObserver"
@@ -47,6 +47,8 @@ const useStyles = makeStyles((theme) => ({
 function Chart() {
   const { socketState } = React.useContext(SocketStateContext)
   const state = React.useContext(AppStateContext)
+  const isMD = useMediaQuery("(min-width:700px)")
+  const isSM = useMediaQuery("(min-width:600px)")
 
   const filterSocketData = (data) => {
     return data.filter((el) => {
@@ -91,6 +93,7 @@ function Chart() {
   }
 
   useEffect(() => {
+    const margin = { top: 10, right: 30, bottom: 30, left: isSM ? 60 : 45 }
     const svg = select(svgRef.current)
     svg.selectAll(".path").remove()
     const wrapper = select(wrapperRef.current)
@@ -100,7 +103,7 @@ function Chart() {
     const domainData = domainConcat(formattedData)
 
     const { height, width } = dimensions
-    const margin = { top: 10, right: 30, bottom: 30, left: 60 }
+
     const tooltipScale = scaleLinear()
       .domain([0, width - margin.left - margin.right])
       .range([startingDay, Date.parse(today)])
@@ -114,7 +117,7 @@ function Chart() {
     svg
       .select(".x-axis")
       .attr(`transform`, `translate(0,${height - margin.bottom})`)
-      .call(axisBottom(scaleX))
+      .call(isMD ? axisBottom(scaleX) : axisBottom(scaleX).ticks(5))
 
     const scaleY = scaleLinear()
       .domain(extent(domainData, (d) => d.y))
@@ -146,13 +149,14 @@ function Chart() {
             return scaleY(d.y)
           })
       )
+    svg.selectAll(".rect").remove()
     const rect = svg
       .append("rect")
+      .attr("class", "rect")
       .attr("width", width - margin.left - margin.right)
       .attr("height", height - margin.top - margin.bottom)
       .attr("transform", `translate(${margin.left},${margin.top})`)
       .attr("opacity", 0)
-    let verticalLine
     rect
       .on("mousemove", function (value, index) {
         const [x] = mouse(this)
@@ -194,8 +198,12 @@ function Chart() {
           })
           .style("position", "absolute")
           .style("top", `${event.clientY - 30}px`)
-          .style("left", `${event.clientX + 20}px`)
-
+          .style("left", () =>
+            this.getBoundingClientRect().width - x > 100
+              ? `${event.clientX + 20}px`
+              : `${event.clientX - 105}px`
+          )
+        console.log(x)
         svg.selectAll(".vertical").remove()
         svg
           .append("line")

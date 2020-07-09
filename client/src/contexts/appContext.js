@@ -5,6 +5,7 @@ const initialState = {
   hiddenCoins: new Set(),
   range: 30,
   baseCurrency: "usd",
+  isDark: false,
 }
 const AppStateContext = React.createContext()
 const AppDispatchContext = React.createContext()
@@ -32,6 +33,11 @@ const AppContextProvider = ({ children }) => {
         return {
           ...state,
           baseCurrency: action.baseCurrency,
+        }
+      case TYPES.SET_THEME:
+        return {
+          ...state,
+          isDark: !state.isDark,
         }
       default:
         return state

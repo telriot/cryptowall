@@ -11,13 +11,14 @@ const useStyles = makeStyles((theme) => ({
   },
   panelDiv: {
     width: "100%",
+    [theme.breakpoints.down("500")]: { padding: "24px 0" },
   },
 }))
 function AddPanel() {
   const classes = useStyles()
 
   return (
-    <Grid item xs={5}>
+    <Grid item xs={12} md={5}>
       <div className={classes.panelDiv}>
         <AddInput />
         <AddButton />

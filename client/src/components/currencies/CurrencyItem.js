@@ -6,9 +6,9 @@ import { palette } from "../chart/Chart"
 import { makeStyles } from "@material-ui/core/styles"
 
 function CurrencyItem({ coin, index }) {
+  const state = React.useContext(AppStateContext)
   const { socket, socketState } = React.useContext(SocketStateContext)
   const dispatch = React.useContext(AppDispatchContext)
-  const state = React.useContext(AppStateContext)
 
   const handleDelete = (id) => () => {
     socket.current.emit("delete coin", id)
@@ -17,17 +17,23 @@ function CurrencyItem({ coin, index }) {
   const handleClick = (coin) => () => {
     dispatch({ type: "TOGGLE_HIDE_COIN", coin })
   }
-  const useStyles = makeStyles({
-    root: { margin: "5px 7px 0 0" },
+  const useStyles = makeStyles((theme) => ({
+    root: {
+      margin: "0 7px 7px 0",
+      [theme.breakpoints.down("500")]: {
+        width: "100%",
+        margin: "7px 7px 0px 0",
+      },
+    },
     outlinedPrimary: {
       border: `1px solid ${palette[index]}`,
-      color: "#616161",
+      color: state.isDark ? "#bfbfbf" : "#616161",
     },
     deleteIconColorPrimary: {
       color: palette[index],
       "&:hover": { color: "#888888" },
     },
-  })
+  }))
   const classes = useStyles()
 
   return (

@@ -4,8 +4,6 @@ import { SocketStateContext } from "../../contexts/socketContext"
 import { render, fireEvent, cleanup } from "@testing-library/react"
 import { AppStateContext } from "../../contexts/appContext"
 
-import axios from "axios"
-
 afterEach(cleanup)
 
 let socket = { current: { emit: jest.fn() } }
@@ -34,5 +32,4 @@ describe("CurrencyItem tests", () => {
     fireEvent.keyUp(document.activeElement, { key: "Delete" })
     expect(socket.current.emit).toHaveBeenCalledWith("delete coin", coin.id)
   })
-  // TODO test("Do something on button click, maybe higlight chart line")
 })
