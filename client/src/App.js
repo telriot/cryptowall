@@ -1,5 +1,7 @@
 import React from "react"
+import { AppStateContext } from "./contexts/appContext"
 import { AddPanelProvider } from "./contexts/addPanelContext"
+import TopRow from "./components/TopRow/TopRow"
 import Chart from "./components/chart/Chart"
 import Currencies from "./components/currencies/Currencies"
 import AddPanel from "./components/addPanel/AddPanel"
@@ -9,8 +11,6 @@ import {
   createMuiTheme,
   ThemeProvider,
 } from "@material-ui/core/styles"
-import TopRow from "./components/TopRow/TopRow"
-import { AppStateContext } from "./contexts/appContext"
 
 function App() {
   const state = React.useContext(AppStateContext)
@@ -32,6 +32,9 @@ function App() {
     },
   }))
 
+  const isSM = useMediaQuery("(min-width:500px)")
+  const classes = useStyles()
+
   const presentTheme = state.isDark ? "dark" : "light"
   const customTheme = createMuiTheme({
     palette: {
@@ -39,8 +42,6 @@ function App() {
     },
   })
 
-  const isSM = useMediaQuery("(min-width:500px)")
-  const classes = useStyles()
   return (
     <ThemeProvider theme={customTheme}>
       <div className={classes.app}>
