@@ -10,7 +10,6 @@ function RangeSelector() {
   const dispatch = React.useContext(AppDispatchContext)
   const isSM = useMediaQuery("(min-width:500px)")
   const isXS = useMediaQuery("(max-width:400px)")
-  const classes = useStyles()
   const handleClick = (range) => () => {
     dispatch({ type: TYPES.SET_RANGE, range })
   }
