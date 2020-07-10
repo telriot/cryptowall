@@ -1,28 +1,38 @@
 import React from "react"
 import Currencies from "./Currencies"
 import { SocketStateContext } from "../../contexts/socketContext"
-import { render, screen, cleanup } from "@testing-library/react"
-import { AppStateContext } from "../../contexts/appContext"
+import { render, cleanup } from "@testing-library/react"
+import { AppContextProvider } from "../../contexts/appContext"
 
 afterEach(cleanup)
 
-let socket = { current: { emit: jest.fn() } }
 let socketState = {
   data: [
-    { _id: "1234556776", code: "btc", id: "bitcoin", name: "Bitcoin" },
-    { _id: "44444556776", code: "eth", id: "ethereum", name: "Ethereum" },
+    {
+      _id: "1234556776",
+      code: "btc",
+      id: "bitcoin",
+      name: "Bitcoin",
+      value: 9999,
+    },
+    {
+      _id: "44444556776",
+      code: "eth",
+      id: "ethereum",
+      name: "Ethereum",
+      value: 222,
+    },
   ],
 }
-let appState = { hiddenCoins: new Set() }
 describe("Currencies tests", () => {
-  let getByText, getByRole, getByTestId, getAllByRole
+  let getByTestId, getAllByRole
   beforeEach(() => {
-    return ({ getByText, getByRole, getByTestId, getAllByRole } = render(
-      <AppStateContext.Provider value={appState}>
-        <SocketStateContext.Provider value={{ socket, socketState }}>
+    return ({ getByTestId, getAllByRole } = render(
+      <AppContextProvider>
+        <SocketStateContext.Provider value={{ socketState }}>
           <Currencies />
         </SocketStateContext.Provider>
-      </AppStateContext.Provider>
+      </AppContextProvider>
     ))
   })
   test("Currencies render successfully", () => {
