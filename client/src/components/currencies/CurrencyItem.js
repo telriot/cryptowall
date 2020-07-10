@@ -4,19 +4,13 @@ import { SocketStateContext } from "../../contexts/socketContext"
 import { AppStateContext, AppDispatchContext } from "../../contexts/appContext"
 import { palette } from "../chart/Chart"
 import { makeStyles } from "@material-ui/core/styles"
+import { TYPES } from "../../contexts/types"
 
 function CurrencyItem({ coin, index }) {
   const state = React.useContext(AppStateContext)
-  const { socket, socketState } = React.useContext(SocketStateContext)
+  const { socket } = React.useContext(SocketStateContext)
   const dispatch = React.useContext(AppDispatchContext)
 
-  const handleDelete = (id) => () => {
-    socket.current.emit("delete coin", id)
-  }
-
-  const handleClick = (coin) => () => {
-    dispatch({ type: "TOGGLE_HIDE_COIN", coin })
-  }
   const useStyles = makeStyles((theme) => ({
     root: {
       margin: "0 7px 7px 0",
@@ -34,7 +28,16 @@ function CurrencyItem({ coin, index }) {
       "&:hover": { color: "#888888" },
     },
   }))
+
   const classes = useStyles()
+
+  const handleDelete = (id) => () => {
+    socket.current.emit("delete coin", id)
+  }
+
+  const handleClick = (coin) => () => {
+    dispatch({ type: TYPES.TOGGLE_HIDE_COIN, coin })
+  }
 
   return (
     <Chip
