@@ -1,15 +1,15 @@
 import React from "react"
 import Chip from "@material-ui/core/Chip"
-import { SocketStateContext } from "../../contexts/socketContext"
-import { AppStateContext, AppDispatchContext } from "../../contexts/appContext"
+import { useSocketState } from "../../contexts/socketContext"
+import { useAppState, useAppDispatch } from "../../contexts/appContext"
 import { palette } from "../chart/Chart"
 import { makeStyles } from "@material-ui/core/styles"
 import { TYPES } from "../../contexts/types"
 
 function CurrencyItem({ coin, index }) {
-  const state = React.useContext(AppStateContext)
-  const { socket } = React.useContext(SocketStateContext)
-  const dispatch = React.useContext(AppDispatchContext)
+  const state = useAppState()
+  const { socket } = useSocketState()
+  const dispatch = useAppDispatch()
 
   const useStyles = makeStyles((theme) => ({
     root: {

@@ -1,10 +1,9 @@
 import React from "react"
 import FormControlLabel from "@material-ui/core/FormControlLabel"
-import { Grid, Switch } from "@material-ui/core"
+import { Switch } from "@material-ui/core"
 import { makeStyles } from "@material-ui/core/styles"
-
 import { Brightness3, Brightness5 } from "@material-ui/icons"
-import { AppDispatchContext } from "../../contexts/appContext"
+import { useAppDispatch } from "../../contexts/appContext"
 import { TYPES } from "../../contexts/types"
 const useStyles = makeStyles((theme) => ({
   div: {
@@ -13,9 +12,10 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
   },
 }))
+
 function DarkModeSwitch(props) {
   const [state, setState] = React.useState(false)
-  const dispatch = React.useContext(AppDispatchContext)
+  const dispatch = useAppDispatch()
   const classes = useStyles()
   const handleChange = (event) => {
     setState(event.target.checked)

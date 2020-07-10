@@ -1,19 +1,17 @@
 import React, { useEffect } from "react"
 import { Autocomplete } from "@material-ui/lab"
-import { CircularProgress, TextField, Popper } from "@material-ui/core"
-import axios from "axios"
-import useDebounce from "../../hooks/useDebounce"
+import { CircularProgress, TextField } from "@material-ui/core"
 import {
-  AddPanelStateContext,
-  AddPanelDispatchContext,
+  useAddPanelState,
+  useAddPanelDispatch,
 } from "../../contexts/addPanelContext"
+import useDebounce from "../../hooks/useDebounce"
+import axios from "axios"
 
 function AddInput() {
   const AUTOCOMPLETE_URL = "api/coins/autocomplete/"
-  const { options, loading, input, selection } = React.useContext(
-    AddPanelStateContext
-  )
-  const dispatch = React.useContext(AddPanelDispatchContext)
+  const { options, loading, input, selection } = useAddPanelState()
+  const dispatch = useAddPanelDispatch()
   const inputField = React.useRef()
   const [open, setOpen] = React.useState(false)
   const debouncedInput = useDebounce(input, 300)

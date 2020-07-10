@@ -5,13 +5,26 @@ import {
   AddPanelStateContext,
 } from "../../contexts/addPanelContext"
 import { render, fireEvent, cleanup } from "@testing-library/react"
-import axios from "axios"
 import useDebounce from "../../hooks/useDebounce"
 
 afterEach(cleanup)
-
-jest.mock("axios")
+let dispatch = jest.fn()
+let state = {
+  input: "",
+  options: [],
+  selection: undefined,
+  loading: false,
+}
 jest.mock("../../hooks/useDebounce")
+
+const inputRender = (state, dispatch) =>
+  render(
+    <AddPanelStateContext.Provider value={state}>
+      <AddPanelDispatchContext.Provider value={dispatch}>
+        <AddInput />
+      </AddPanelDispatchContext.Provider>
+    </AddPanelStateContext.Provider>
+  )
 
 describe("AddInput on !selection", () => {
   useDebounce.mockReturnValue("b")
@@ -20,22 +33,11 @@ describe("AddInput on !selection", () => {
     { code: "btc", id: "bitcoin", name: "Bitcoin" },
     { code: "eth", id: "ethereum", name: "Ethereum" },
   ]
-  let state = {
-    input: "",
-    options,
-    selection: undefined,
-    loading: false,
-  }
+
   let getByRole
 
   beforeEach(() => {
-    return ({ getByRole } = render(
-      <AddPanelStateContext.Provider value={state}>
-        <AddPanelDispatchContext.Provider value={dispatch}>
-          <AddInput />
-        </AddPanelDispatchContext.Provider>
-      </AddPanelStateContext.Provider>
-    ))
+    return ({ getByRole } = inputRender({ ...state, options }, dispatch))
   })
   describe("Input on change", () => {
     test("Dispatch fires correctly on change", () => {
@@ -62,33 +64,24 @@ describe("AddInput on !selection", () => {
       fireEvent.keyDown(document.activeElement, { key: "Enter" })
       expect(dispatch).toHaveBeenCalledWith({
         type: "SET_SELECTION",
-        selection: state.options[0],
+        selection: options[0],
       })
     })
   })
 })
 describe("AddInput when selection", () => {
   useDebounce.mockReturnValue("b")
-  let dispatch = jest.fn()
   let options = [
     { code: "btc", id: "bitcoin", name: "Bitcoin" },
     { code: "eth", id: "ethereum", name: "Ethereum" },
   ]
-  let state = {
-    input: "bit",
-    options,
-    selection: { code: "btc", id: "bitcoin", name: "Bitcoin" },
-    loading: false,
-  }
-  let getByRole, getByLabelText, getByTestId
+  let selection = { selection: { code: "btc", id: "bitcoin", name: "Bitcoin" } }
+  let getByRole
 
   beforeEach(() => {
-    return ({ getByRole, getByLabelText, getByTestId } = render(
-      <AddPanelStateContext.Provider value={state}>
-        <AddPanelDispatchContext.Provider value={dispatch}>
-          <AddInput />
-        </AddPanelDispatchContext.Provider>
-      </AddPanelStateContext.Provider>
+    return ({ getByRole } = inputRender(
+      { ...state, ...selection, options },
+      dispatch
     ))
   })
 

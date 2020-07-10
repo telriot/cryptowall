@@ -1,15 +1,15 @@
 import React from "react"
 import { Button } from "@material-ui/core"
 import {
-  AddPanelStateContext,
-  AddPanelDispatchContext,
+  useAddPanelState,
+  useAddPanelDispatch,
 } from "../../contexts/addPanelContext"
-import { SocketStateContext } from "../../contexts/socketContext"
+import { useSocketState } from "../../contexts/socketContext"
 
 function AddButton() {
-  const { selection } = React.useContext(AddPanelStateContext)
-  const dispatch = React.useContext(AddPanelDispatchContext)
-  const { socket, socketState } = React.useContext(SocketStateContext)
+  const { selection } = useAddPanelState()
+  const dispatch = useAddPanelDispatch()
+  const { socket, socketState } = useSocketState()
   const handleAdd = (selection) => {
     if (!selection) return
 

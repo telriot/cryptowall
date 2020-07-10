@@ -1,13 +1,11 @@
 import React from "react"
-import { AppStateContext, AppDispatchContext } from "../../contexts/appContext"
+import { useAppState, useAppDispatch } from "../../contexts/appContext"
 import { Button, ButtonGroup, useMediaQuery } from "@material-ui/core"
-import { makeStyles } from "@material-ui/core/styles"
 import { TYPES } from "../../contexts/types"
 
-const useStyles = makeStyles((theme) => ({}))
 function RangeSelector() {
-  const { range } = React.useContext(AppStateContext)
-  const dispatch = React.useContext(AppDispatchContext)
+  const { range } = useAppState()
+  const dispatch = useAppDispatch()
   const isSM = useMediaQuery("(min-width:500px)")
   const isXS = useMediaQuery("(max-width:400px)")
   const handleClick = (range) => () => {

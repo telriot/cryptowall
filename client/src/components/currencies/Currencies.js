@@ -1,10 +1,10 @@
 import React from "react"
 import CurrencyItem from "./CurrencyItem"
 import { Grid } from "@material-ui/core"
-import { SocketStateContext } from "../../contexts/socketContext"
+import { useSocketState } from "../../contexts/socketContext"
 
 function Currencies() {
-  const { socketState } = React.useContext(SocketStateContext)
+  const { socketState } = useSocketState()
   const { data } = socketState
   return (
     <Grid data-testid="component-currencies" item xs={12} md={7}>
