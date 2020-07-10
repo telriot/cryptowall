@@ -9,31 +9,34 @@ import { SocketStateContext } from "../../contexts/socketContext"
 
 afterEach(cleanup)
 
-jest.mock("axios")
-
 let dispatch = jest.fn()
 let socket = { current: { emit: jest.fn() } }
+let addPanelState = {
+  input: "",
+  options: [],
+  selection: "",
+  loading: false,
+}
+
+const buttonRender = (
+  addPanelState = addPanelState,
+  socketState = { data: [] }
+) =>
+  render(
+    <SocketStateContext.Provider value={{ socket, socketState }}>
+      <AddPanelStateContext.Provider value={addPanelState}>
+        <AddPanelDispatchContext.Provider value={dispatch}>
+          <AddButton />
+        </AddPanelDispatchContext.Provider>
+      </AddPanelStateContext.Provider>
+    </SocketStateContext.Provider>
+  )
 
 describe("AddButton tests", () => {
-  let state = {
-    input: "",
-    options: [],
-    selection: "",
-    loading: false,
-  }
-  let getByRole, getByText
-  state.selection = ""
+  let getByRole
   describe("On selection === undefined", () => {
     beforeEach(() => {
-      return ({ getByRole, getByText } = render(
-        <SocketStateContext.Provider value={{ socket }}>
-          <AddPanelStateContext.Provider value={state}>
-            <AddPanelDispatchContext.Provider value={dispatch}>
-              <AddButton />
-            </AddPanelDispatchContext.Provider>
-          </AddPanelStateContext.Provider>
-        </SocketStateContext.Provider>
-      ))
+      return ({ getByRole } = buttonRender(addPanelState))
     })
     test("Button renders correctly", () => {
       expect(getByRole("button")).toBeDefined()
@@ -48,22 +51,13 @@ describe("AddButton tests", () => {
     })
   })
   describe("On selection defined", () => {
-    let state = {
-      input: "",
-      options: [],
-      selection: { code: "btc", id: "bitcoin", name: "Bitcoin" },
-      loading: false,
-    }
+    let getByRole
+    let state = { selection: { code: "btc", id: "bitcoin", name: "Bitcoin" } }
     beforeEach(() => {
-      return ({ getByRole, getByText } = render(
-        <SocketStateContext.Provider value={{ socket }}>
-          <AddPanelStateContext.Provider value={state}>
-            <AddPanelDispatchContext.Provider value={dispatch}>
-              <AddButton />
-            </AddPanelDispatchContext.Provider>
-          </AddPanelStateContext.Provider>
-        </SocketStateContext.Provider>
-      ))
+      return ({ getByRole } = buttonRender({
+        ...addPanelState,
+        ...state,
+      }))
     })
 
     test("Button is active when a coin is selected", () => {
@@ -86,6 +80,25 @@ describe("AddButton tests", () => {
         type: "SET_SELECTION",
         selection: undefined,
       })
+    })
+    test("Clear input dispatch is fired on click", () => {
+      const button = getByRole("button")
+      fireEvent.click(button)
+      expect(dispatch).toHaveBeenCalledWith({
+        type: "SET_INPUT",
+        input: "",
+      })
+    })
+  })
+  describe("On data.length > 5", () => {
+    let data = [1, 2, 3, 4, 5, 6]
+    beforeEach(() => {
+      return ({ getByRole } = buttonRender(addPanelState, {
+        data,
+      }))
+    })
+    test("Button is disabled when cap is reached", () => {
+      expect(getByRole("button")).toBeDisabled()
     })
   })
 })

@@ -1,13 +1,12 @@
 import React from "react"
-import { makeStyles } from "@material-ui/core/styles"
 import InputLabel from "@material-ui/core/InputLabel"
 import MenuItem from "@material-ui/core/MenuItem"
-import FormHelperText from "@material-ui/core/FormHelperText"
 import FormControl from "@material-ui/core/FormControl"
 import Select from "@material-ui/core/Select"
+import { makeStyles } from "@material-ui/core/styles"
 import { AppStateContext, AppDispatchContext } from "../../contexts/appContext"
-import { TYPES } from "../../contexts/types"
 import { SocketStateContext } from "../../contexts/socketContext"
+import { TYPES } from "../../contexts/types"
 
 const useStyles = makeStyles((theme) => ({
   formControl: {

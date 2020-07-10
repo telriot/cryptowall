@@ -4,14 +4,12 @@ import {
   AddPanelStateContext,
   AddPanelDispatchContext,
 } from "../../contexts/addPanelContext"
-import { AppStateContext } from "../../contexts/appContext"
 import { SocketStateContext } from "../../contexts/socketContext"
 
 function AddButton() {
   const { selection } = React.useContext(AddPanelStateContext)
   const dispatch = React.useContext(AddPanelDispatchContext)
   const { socket, socketState } = React.useContext(SocketStateContext)
-  const { baseCurrency } = React.useContext(AppStateContext)
   const handleAdd = (selection) => {
     if (!selection) return
 
@@ -19,7 +17,6 @@ function AddButton() {
       id: selection.id,
       symbol: selection.code,
       name: selection.name,
-      base: baseCurrency,
     })
     dispatch({
       type: "SET_SELECTION",
@@ -36,7 +33,7 @@ function AddButton() {
         onClick={() => handleAdd(selection)}
         variant="contained"
         color="primary"
-        disabled={(!selection, socketState.data.length >= 5)}
+        disabled={!selection || socketState.data.length >= 5}
       >
         {socketState.data.length >= 5 ? "Coin cap reached" : "Add coin"}
       </Button>
