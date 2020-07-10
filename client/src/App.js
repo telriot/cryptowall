@@ -12,11 +12,14 @@ import {
   ThemeProvider,
 } from "@material-ui/core/styles"
 
+export const darkBg = "#333"
+export const lightBg = "#FFF"
+
 function App() {
   const state = React.useContext(AppStateContext)
   const useStyles = makeStyles((theme) => ({
     app: {
-      background: state.isDark ? "#333" : "#FFFFFF",
+      background: state.isDark ? darkBg : lightBg,
     },
     container: {
       paddingTop: "20px",
@@ -44,8 +47,8 @@ function App() {
 
   return (
     <ThemeProvider theme={customTheme}>
-      <div className={classes.app}>
-        <Container className={classes.container} data-test="component-app">
+      <div data-testid="component-app" className={classes.app}>
+        <Container className={classes.container}>
           <Grid
             direction="column"
             justify="space-around"
