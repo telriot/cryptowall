@@ -8,8 +8,19 @@ import {
 import useDebounce from "../../hooks/useDebounce"
 import axios from "axios"
 
+const AUTOCOMPLETE_URL = "api/coins/autocomplete/"
+export const fetchCoinNames = async (input) => {
+  try {
+    const response = await axios.get(AUTOCOMPLETE_URL, { params: { input } })
+    const coins = response.data
+    return coins
+  } catch (error) {
+    console.log(error)
+    return []
+  }
+}
+
 function AddInput() {
-  const AUTOCOMPLETE_URL = "api/coins/autocomplete/"
   const { options, loading, input, selection } = useAddPanelState()
   const dispatch = useAddPanelDispatch()
   const inputField = React.useRef()
@@ -25,8 +36,7 @@ function AddInput() {
   const getCoinNames = async (input) => {
     dispatch({ type: "SET_LOADING", loading: true })
     try {
-      const response = await axios.get(AUTOCOMPLETE_URL, { params: { input } })
-      const coins = response.data
+      const coins = await fetchCoinNames(input)
       dispatch({
         type: "SET_OPTIONS",
         options: coins.map((coin) => ({

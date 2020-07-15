@@ -19,7 +19,7 @@ const debug = require("debug")("portfolio-app:server")
 const data = require("./assets/coinList.json")
 //Connect to the DB
 mongoose.connect(
-  process.env.MONGO_URI || `mongodb://localhost:27017/portfolio-app`,
+  /*process.env.MONGO_URI || */ `mongodb://localhost:27017/portfolio-app`,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,

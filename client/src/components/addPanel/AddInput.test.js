@@ -6,6 +6,9 @@ import {
 } from "../../contexts/addPanelContext"
 import { render, fireEvent, cleanup } from "@testing-library/react"
 import useDebounce from "../../hooks/useDebounce"
+import axios from "axios"
+import { fetchCoinNames } from "./AddInput"
+import { TYPES } from "../../contexts/types"
 
 afterEach(cleanup)
 let dispatch = jest.fn()
@@ -16,6 +19,7 @@ let state = {
   loading: false,
 }
 jest.mock("../../hooks/useDebounce")
+jest.mock("axios")
 
 const inputRender = (state, dispatch) =>
   render(
@@ -96,5 +100,33 @@ describe("AddInput when selection", () => {
       type: "SET_SELECTION",
       selection: "",
     })
+  })
+})
+
+describe("Async tests", () => {
+  useDebounce.mockReturnValue("bit")
+  let options = [
+    { code: "btc", id: "bitcoin", name: "Bitcoin" },
+    { code: "eth", id: "ethereum", name: "Ethereum" },
+  ]
+  let getByRole
+  beforeEach(() => {
+    return ({ getByRole } = inputRender(
+      { ...state, input: "bit", options },
+      dispatch
+    ))
+  })
+  test("Axios call fires on debouncedInput.length >2", async () => {
+    const response = [{ symbol: "btc", id: "bitcoin", name: "Bitcoin" }]
+    axios.get.mockImplementationOnce(() =>
+      Promise.resolve({
+        data: response,
+      })
+    )
+    const coins = await fetchCoinNames("bit")
+    expect(axios.get).toHaveBeenCalledWith("api/coins/autocomplete/", {
+      params: { input: "bit" },
+    })
+    expect(coins).toEqual(response)
   })
 })
