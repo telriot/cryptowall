@@ -109,7 +109,7 @@ if (!refreshInterval)
   );
 
 // Mount Routes
-app.use("/", indexRouter);
+//app.use("/", indexRouter);
 app.use("/api/coins", coinsRouter);
 
 console.log(process.env.NODE_ENV);
