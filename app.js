@@ -112,6 +112,7 @@ if (!refreshInterval)
 app.use("/", indexRouter);
 app.use("/api/coins", coinsRouter);
 
+console.log(process.env.NODE_ENV);
 // Prepare Production Settings
 
 if (process.env.NODE_ENV === "production") {
