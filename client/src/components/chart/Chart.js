@@ -1,9 +1,9 @@
-import React, { useRef, useEffect } from "react"
-import { Paper, Grid, useMediaQuery } from "@material-ui/core"
-import { makeStyles } from "@material-ui/core/styles"
-import { AppStateContext } from "../../contexts/appContext"
-import useResizeObserver from "../../hooks/useResizeObserver"
-import { SocketStateContext } from "../../contexts/socketContext"
+import React, { useRef, useEffect } from "react";
+import { Paper, Grid, useMediaQuery } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+import { AppStateContext } from "../../contexts/appContext";
+import useResizeObserver from "../../hooks/useResizeObserver";
+import { SocketStateContext } from "../../contexts/socketContext";
 import {
   select,
   scaleTime,
@@ -14,7 +14,7 @@ import {
   scaleLinear,
   line,
   mouse,
-} from "d3"
+} from "d3";
 export const palette = [
   "#8338ecff",
   "#3a86ffff",
@@ -26,7 +26,7 @@ export const palette = [
   "#0ead69",
   "#706677",
   "#f2b5d4",
-]
+];
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -42,90 +42,97 @@ const useStyles = makeStyles((theme) => ({
     zIndex: 10,
     whiteSpace: "nowrap",
   },
-}))
+}));
 
 function Chart() {
-  const { socketState } = React.useContext(SocketStateContext)
-  const state = React.useContext(AppStateContext)
-  const isMD = useMediaQuery("(min-width:700px)")
-  const isSM = useMediaQuery("(min-width:600px)")
+  const { socketState } = React.useContext(SocketStateContext);
+  const state = React.useContext(AppStateContext);
+  const isMD = useMediaQuery("(min-width:700px)");
+  const isSM = useMediaQuery("(min-width:600px)");
 
   const filterSocketData = (data) => {
     return data.filter((el) => {
-      return !state.hiddenCoins.has(el.id)
-    })
-  }
+      return !state.hiddenCoins.has(el.id);
+    });
+  };
 
-  const data = socketState.data.length ? filterSocketData(socketState.data) : []
-  const classes = useStyles()
-  const svgRef = useRef()
-  const wrapperRef = useRef()
-  const dimensions = useResizeObserver(wrapperRef)
-  const day = new Date()
-  const startingDay = day.setDate(day.getDate() - state.range)
-  const today = new Date()
+  const data = socketState.data.length
+    ? filterSocketData(socketState.data)
+    : [];
+  const classes = useStyles();
+  const svgRef = useRef();
+  const wrapperRef = useRef();
+  const dimensions = useResizeObserver(wrapperRef);
+  const day = new Date();
+  const startingDay = day.setDate(day.getDate() - state.range);
+  const today = new Date();
   const getDataRange = (timeframe) => {
     switch (timeframe) {
       case 1:
-        return "dailyData"
+        return "dailyData";
       case 7:
-        return "weeklyData"
+        return "weeklyData";
       case 30:
-        return "monthlyData"
+        return "monthlyData";
       case 365:
-        return "yearlyData"
+        return "yearlyData";
+      default:
+        return null;
     }
-  }
-  const formatData = (data) => {
-    let dataRange = getDataRange(state.range)
-    let items = []
-    for (let item of data) {
-      items.push(item[dataRange].map((el) => ({ x: el[0], y: el[1] })))
-    }
-    return items
-  }
+  };
+  const formatData = React.useCallback(
+    (data) => {
+      let dataRange = getDataRange(state.range);
+      let items = [];
+      for (let item of data) {
+        items.push(item[dataRange].map((el) => ({ x: el[0], y: el[1] })));
+      }
+      return items;
+    },
+    [state.range]
+  );
   const domainConcat = (data) => {
-    let concatItem = []
+    let concatItem = [];
     for (let group of data) {
-      concatItem = concatItem.concat(group)
+      concatItem = concatItem.concat(group);
     }
-    return concatItem
-  }
+    return concatItem;
+  };
 
   useEffect(() => {
-    const margin = { top: 10, right: 30, bottom: 30, left: isSM ? 60 : 45 }
-    const svg = select(svgRef.current)
-    svg.selectAll(".path").remove()
-    const wrapper = select(wrapperRef.current)
-    if (!dimensions) return
-    if (!data.length) return
-    const formattedData = formatData(data)
-    const domainData = domainConcat(formattedData)
+    const margin = { top: 10, right: 30, bottom: 30, left: isSM ? 60 : 45 };
+    const svg = select(svgRef.current);
+    svg.selectAll(".path").remove();
+    const wrapper = select(wrapperRef.current);
+    if (!dimensions) return;
+    if (!data.length) return;
+    const formattedData = formatData(data);
+    const domainData = domainConcat(formattedData);
 
-    const { height, width } = dimensions
+    const { height, width } = dimensions;
 
     const tooltipScale = scaleLinear()
       .domain([0, width - margin.left - margin.right])
-      .range([startingDay, Date.parse(today)])
+      .range([startingDay, Date.parse(today)]);
     const tooltipScaleToIndex = scaleLinear()
       .domain([startingDay, Date.parse(today)])
-      .range([0, formattedData[0].length])
+      .range([0, formattedData[0].length]);
 
     const scaleX = scaleTime()
       .domain([startingDay, Date.parse(today)])
-      .range([margin.left, width - margin.right])
+      .range([margin.left, width - margin.right]);
     svg
       .select(".x-axis")
       .attr(`transform`, `translate(0,${height - margin.bottom})`)
-      .call(isMD ? axisBottom(scaleX) : axisBottom(scaleX).ticks(5))
+      .call(isMD ? axisBottom(scaleX) : axisBottom(scaleX).ticks(5));
 
     const scaleY = scaleLinear()
       .domain(extent(domainData, (d) => d.y))
-      .range([height - margin.bottom, margin.top])
+      .range([height - margin.bottom, margin.top]);
     svg
       .select(".y-axis")
       .attr(`transform`, `translate(${margin.left},0)`)
-      .call(axisLeft(scaleY))
+      .call(axisLeft(scaleY));
     svg
       .selectAll(".path")
       .data(formattedData)
@@ -133,34 +140,34 @@ function Chart() {
       .attr("class", "path")
       .attr("fill", "none")
       .attr("stroke", (d, index) => {
-        const coinId = data[index]["id"]
-        const dataIndex = socketState.data.findIndex((el) => el.id === coinId)
-        return palette[dataIndex]
+        const coinId = data[index]["id"];
+        const dataIndex = socketState.data.findIndex((el) => el.id === coinId);
+        return palette[dataIndex];
       })
       .attr("stroke-width", 1.5)
       .attr(
         "d",
         line()
           .x((d) => {
-            if (scaleX(d.x) > margin.left) return scaleX(d.x)
-            return margin.left
+            if (scaleX(d.x) > margin.left) return scaleX(d.x);
+            return margin.left;
           })
           .y((d) => {
-            return scaleY(d.y)
+            return scaleY(d.y);
           })
-      )
-    svg.selectAll(".rect").remove()
+      );
+    svg.selectAll(".rect").remove();
     const rect = svg
       .append("rect")
       .attr("class", "rect")
       .attr("width", width - margin.left - margin.right)
       .attr("height", height - margin.top - margin.bottom)
       .attr("transform", `translate(${margin.left},${margin.top})`)
-      .attr("opacity", 0)
+      .attr("opacity", 0);
     rect
       .on("mousemove", function (value, index) {
-        const [x] = mouse(this)
-        wrapper.select(".tooltip").remove()
+        const [x] = mouse(this);
+        wrapper.select(".tooltip").remove();
         wrapper
           .selectAll(".tooltip")
           .data(formattedData)
@@ -168,33 +175,33 @@ function Chart() {
           .attr("class", `tooltip ${classes.tooltip}`)
 
           .html(() => {
-            const time = tooltipScale(x)
-            const xIndex = parseInt(tooltipScaleToIndex(time))
-            const date = new Date(time)
+            const time = tooltipScale(x);
+            const xIndex = parseInt(tooltipScaleToIndex(time));
+            const date = new Date(time);
             const weekday = new Intl.DateTimeFormat("en-US", {
               weekday: "short",
-            }).format(date)
+            }).format(date);
 
-            const range = getDataRange(state.range)
+            const range = getDataRange(state.range);
             const dateString =
               range === "yearlyData" || range === "monthlyData"
                 ? `<h4>${date.toDateString().slice(4, 11)}</h4>`
                 : range === "weeklyData" || range === "dailyData"
                 ? `<h4>${weekday}, ${date.toTimeString().slice(0, 5)}</h4>`
-                : null
+                : null;
             return dateString.concat(
               data
                 .map((coin) => {
-                  let dataRange = getDataRange(state.range)
-                  if (!coin[dataRange][xIndex]) return "<div/>"
+                  let dataRange = getDataRange(state.range);
+                  if (!coin[dataRange][xIndex]) return "<div/>";
                   return `<div>
                   <p>${coin.symbol.toUpperCase()}: ${coin[dataRange][
                     xIndex
                   ][1].toFixed(4)}</p> 
-                </div>`
+                </div>`;
                 })
                 .join(" ")
-            )
+            );
           })
           .style("position", "absolute")
           .style("top", `${event.clientY - 30}px`)
@@ -202,9 +209,8 @@ function Chart() {
             this.getBoundingClientRect().width - x > 100
               ? `${event.clientX + 20}px`
               : `${event.clientX - 105}px`
-          )
-        console.log(x)
-        svg.selectAll(".vertical").remove()
+          );
+        svg.selectAll(".vertical").remove();
         svg
           .append("line")
           .attr("class", "vertical")
@@ -214,7 +220,7 @@ function Chart() {
           .attr("y2", event.offsetY - 4)
           .style("stroke-width", 0.25)
           .style("stroke", "#616161")
-          .style("fill", "none")
+          .style("fill", "none");
         svg
           .append("line")
           .attr("class", "vertical")
@@ -224,13 +230,24 @@ function Chart() {
           .attr("y2", height - margin.bottom)
           .style("stroke-width", 0.25)
           .style("stroke", "#616161")
-          .style("fill", "none")
+          .style("fill", "none");
       })
       .on("mouseleave", function () {
-        wrapper.selectAll(".tooltip").remove()
-        svg.selectAll(".vertical").remove()
-      })
-  }, [data, dimensions, state.range])
+        wrapper.selectAll(".tooltip").remove();
+        svg.selectAll(".vertical").remove();
+      });
+  }, [
+    data,
+    dimensions,
+    state.range,
+    classes.tooltip,
+    formatData,
+    isMD,
+    isSM,
+    socketState.data,
+    startingDay,
+    today,
+  ]);
 
   return (
     <Grid item xs={12}>
@@ -253,7 +270,7 @@ function Chart() {
         </svg>
       </Paper>
     </Grid>
-  )
+  );
 }
 
-export default Chart
+export default Chart;

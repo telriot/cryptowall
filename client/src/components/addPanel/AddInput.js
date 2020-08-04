@@ -1,97 +1,96 @@
-import React, { useEffect } from "react"
-import { Autocomplete } from "@material-ui/lab"
-import { CircularProgress, TextField } from "@material-ui/core"
+import React, { useEffect } from "react";
+import { Autocomplete } from "@material-ui/lab";
+import { CircularProgress, TextField } from "@material-ui/core";
 import {
   useAddPanelState,
   useAddPanelDispatch,
-} from "../../contexts/addPanelContext"
-import useDebounce from "../../hooks/useDebounce"
-import axios from "axios"
+} from "../../contexts/addPanelContext";
+import useDebounce from "../../hooks/useDebounce";
+import axios from "axios";
 
-const AUTOCOMPLETE_URL = "api/coins/autocomplete/"
+const AUTOCOMPLETE_URL = "api/coins/autocomplete/";
 export const fetchCoinNames = async (input) => {
   try {
-    const response = await axios.get(AUTOCOMPLETE_URL, { params: { input } })
-    const coins = response.data
-    return coins
+    const response = await axios.get(AUTOCOMPLETE_URL, { params: { input } });
+    const coins = response.data;
+    return coins;
   } catch (error) {
-    console.log(error)
-    return []
+    console.log(error);
+    return [];
   }
-}
+};
 
 function AddInput() {
-  const { options, loading, input, selection } = useAddPanelState()
-  const dispatch = useAddPanelDispatch()
-  const inputField = React.useRef()
-  const [open, setOpen] = React.useState(false)
-  const debouncedInput = useDebounce(input, 300)
+  const { options, loading, input, selection } = useAddPanelState();
+  const dispatch = useAddPanelDispatch();
+  const inputField = React.useRef();
+  const [open, setOpen] = React.useState(false);
+  const debouncedInput = useDebounce(input, 300);
   //This is to fix the issues MUI Autocomplete has with async option lists
   const [selectionPlaceholder, setSelectionPlaceholder] = React.useState({
     code: "test",
     id: "test",
     name: "test",
-  })
-
-  const getCoinNames = async (input) => {
-    dispatch({ type: "SET_LOADING", loading: true })
-    try {
-      const coins = await fetchCoinNames(input)
-      dispatch({
-        type: "SET_OPTIONS",
-        options: coins.map((coin) => ({
-          id: coin.id,
-          name: coin.name,
-          code: coin.symbol,
-        })),
-      })
-      dispatch({ type: "SET_LOADING", loading: false })
-    } catch (error) {
-      dispatch({ type: "SET_LOADING", loading: false })
-      console.log(error)
-    }
-  }
+  });
 
   useEffect(() => {
+    const getCoinNames = async (input) => {
+      dispatch({ type: "SET_LOADING", loading: true });
+      try {
+        const coins = await fetchCoinNames(input);
+        dispatch({
+          type: "SET_OPTIONS",
+          options: coins.map((coin) => ({
+            id: coin.id,
+            name: coin.name,
+            code: coin.symbol,
+          })),
+        });
+        dispatch({ type: "SET_LOADING", loading: false });
+      } catch (error) {
+        dispatch({ type: "SET_LOADING", loading: false });
+        console.log(error);
+      }
+    };
     debouncedInput.length < 2
       ? dispatch({ type: "SET_OPTIONS", options: [] })
-      : getCoinNames(debouncedInput)
-  }, [debouncedInput])
+      : getCoinNames(debouncedInput);
+  }, [debouncedInput, dispatch]);
 
   useEffect(() => {
     if (!open && !selection) {
-      dispatch({ type: "SET_OPTIONS", options: [] })
-      dispatch({ type: "SET_INPUT", input: "" })
+      dispatch({ type: "SET_OPTIONS", options: [] });
+      dispatch({ type: "SET_INPUT", input: "" });
     }
-  }, [open])
+  }, [open, dispatch, selection]);
 
   const handleChange = (e, input) => {
     dispatch({
       type: "SET_INPUT",
       input,
-    })
-  }
+    });
+  };
   const handleAutocompleteChange = (e, value) => {
     dispatch({
       type: "SET_SELECTION",
       selection: value,
-    })
+    });
     if (!selection)
       dispatch({
         type: "SET_INPUT",
         input: "",
-      })
+      });
     if (value) {
-      setSelectionPlaceholder(value)
+      setSelectionPlaceholder(value);
     }
-  }
+  };
 
   const placeholderFilter = (options) =>
     options.filter((option) => {
       return selectionPlaceholder.name === selection && selection.name
         ? true
-        : option.name !== selectionPlaceholder.name
-    })
+        : option.name !== selectionPlaceholder.name;
+    });
 
   return (
     <Autocomplete
@@ -99,10 +98,10 @@ function AddInput() {
       open={open}
       //disablePortal={true}
       onOpen={() => {
-        setOpen(true)
+        setOpen(true);
       }}
       onClose={() => {
-        setOpen(false)
+        setOpen(false);
       }}
       value={selection}
       filterOptions={(options) => placeholderFilter(options)}
@@ -134,7 +133,7 @@ function AddInput() {
         />
       )}
     />
-  )
+  );
 }
 
-export default AddInput
+export default AddInput;
