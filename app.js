@@ -77,16 +77,6 @@ if (!refreshInterval)
 app.use("/", indexRouter);
 app.use("/api/coins", coinsRouter);
 
-// Prepare Production Settings
-
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static("client/build"));
-
-  app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
-  });
-}
-
 //Server config
 const port = process.env.PORT || "5000";
 app.set("port", port);
@@ -122,4 +112,13 @@ function onListening() {
   debug("Listening on " + bind);
 }
 
+// Prepare Production Settings
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("client/build"));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
+}
 module.exports = app;
